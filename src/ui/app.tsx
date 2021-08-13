@@ -114,9 +114,21 @@ export function App() {
     }
 
     async function withdrawFunds() {
-        const funds= await contract.withdrawFunds(account);
-	setWithdrawnFunds(funds);
-        toast('Successfully withdrawn funds', { type: 'success' });
+        try {
+            setTransactionInProgress(true);
+            const tx = await contract.withdrawFunds(account);
+	    setWithdrawTx(tx);
+	    console.log(tx);
+            toast('Successfully withdrawn funds', { type: 'success' });
+        } catch (error) {
+	    console.log(1);
+            console.error(error);
+            toast.error(
+                'There was an error sending your transaction. Please check developer console.'
+            );
+        } finally {
+            setTransactionInProgress(false);
+        }
     }
 
     async function setExistingContractAddress(contractAddress: string) {
@@ -129,7 +141,10 @@ export function App() {
     async function addTheKid() {
         try {
             setTransactionInProgress(true);
-            const tx = await contract.addTheKid(donationAmount, kid, timeInFuture, account);
+	    //const amountx = web3.utils.toWei(donationAmount.toString(),'shannon');
+	    const amountx = donationAmount * 10**8;
+	    console.log(amountx);        
+	    const tx = await contract.addTheKid(amountx, kid, timeInFuture, account);
 	    setAddKidTx(tx);
 	    console.log(tx);
             toast(
@@ -207,7 +222,7 @@ export function App() {
                 withdraw funds
             </button>
             
-            {withdrawnFunds ? <>&nbsp;&nbsp;Success : {withdrawnFunds.toString()}</> : null}
+            {withdrawTx ? <>&nbsp;&nbsp;Success : {withdrawTx.toString()}</> : null}
             <br />
             <br />
             <input

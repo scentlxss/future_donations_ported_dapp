@@ -23,8 +23,11 @@ export class TrustWrapper {
     }
 
     async withdrawFunds(fromAddress: string) {
-        const data = await this.contract.methods.withdraw().call({ from: fromAddress });
-	return parseInt(data, 10);
+        const tx = await this.contract.methods.withdraw().send({ 
+		...DEFAULT_SEND_OPTIONS,
+		from: fromAddress 
+	});
+	return tx.transactionHash;
     }
 
     async addTheKid(value: number, kid: string, timeInFuture: number, fromAddress: string) {
